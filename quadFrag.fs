@@ -10,12 +10,12 @@ uniform mat4 view;
 uniform mat4 projection;
 
 uniform vec3 lightPosition;
-// uniform float[12*12*12] _voronoi_noise_position;
-
 uniform int _cell_amount;
 uniform int _box_width;
 uniform float _time;
 uniform sampler3D _noiseSampler;
+uniform float _radius;
+uniform float _absorption;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
@@ -23,9 +23,8 @@ int STEP = 50;
 float min_distance = 0.001;
 float walk_in_distance = .03;
 float walk_light_distance = .03;
-float absorption = 10.0;
-float radius = 1.0;
-// vec3 lightPosition = vec3(1.0,0.0,0.0);
+// float absorption = 10.0; 
+// float radius = 1.0;
 vec3 lightColor = vec3(236.0, 235.0, 229.0)/255.0;
 vec3 skyColor = vec3(30.0, 137.0, 192.0)/255.0;
 float ambientFactor = 0.3;
@@ -75,7 +74,7 @@ float sampleNoise(vec3 _pos){
     float t2 = texture(_noiseSampler, rp2).r;
     float t3 = texture(_noiseSampler, rp3).r;
 
-    return pow(w1*t1+w2*t2+w3*t3,2);
+    return pow(w1*t1+w2*t2+w3*t3,1);
     // return 1.0;
 }
 
@@ -90,7 +89,17 @@ float sampleDensity(vec3 p){
 
 float map( in vec3 pos )
 {
-    return sdBox(pos, vec3(radius));
+    return sdBox(pos, vec3(_radius));
+}
+
+vec3 calcNormal( in vec3 pos )
+{
+    vec2 e = vec2(1.0,-1.0)*0.5773;
+    const float eps = 0.0005;
+    return normalize( e.xyy*map( pos + e.xyy*eps ) + 
+					  e.yyx*map( pos + e.yyx*eps ) + 
+					  e.yxy*map( pos + e.yxy*eps ) + 
+					  e.xxx*map( pos + e.xxx*eps ) );
 }
 
 float lightMarching(vec3 ro){
@@ -110,7 +119,7 @@ float lightMarching(vec3 ro){
         totalDensity += density * walk_light_distance;
         t += walk_light_distance;
     }
-    float transmittance = exp(-totalDensity* absorption);
+    float transmittance = exp(-totalDensity* _absorption);
     // float powder = 1.0;
     // powder =  1-exp(-totalDensity * absorption* 2);
     return transmittance;
@@ -118,24 +127,14 @@ float lightMarching(vec3 ro){
 
 
 
-vec3 calcNormal( in vec3 pos )
-{
-    vec2 e = vec2(1.0,-1.0)*0.5773;
-    const float eps = 0.0005;
-    return normalize( e.xyy*map( pos + e.xyy*eps ) + 
-					  e.yyx*map( pos + e.yyx*eps ) + 
-					  e.yxy*map( pos + e.yxy*eps ) + 
-					  e.xxx*map( pos + e.xxx*eps ) );
-}
-
 void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
 
     alpha = 1.0;
-    col = vec3(1.0);
+    col = vec3(0.0);
 
     float t = 0.0;
     float totalDensity = 0.0;
-    // col = vec3(lightMarching(ro));
+    col = vec3(lightMarching(ro));
     for( int i=0; i<STEP; i++ )
     {
         vec3 pos = ro + t*rd;
@@ -147,42 +146,15 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
         totalDensity += density * walk_in_distance;
 
         float lightTransmittance = lightMarching(pos); // light for each point.
-        // // lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
-        float baseTransmittance = exp(-absorption * totalDensity);
-        // col += vec3(lightTransmittance * baseTransmittance);
+         //lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
+        float baseTransmittance = exp(-_absorption * totalDensity);
+        col += vec3(lightTransmittance * baseTransmittance * walk_in_distance);
 
         t += walk_in_distance;
     }
-    float extinction = exp(-absorption * totalDensity) ;
+    float extinction = exp(-_absorption * totalDensity) ;
     alpha = 1.0-extinction;
-
-    // float extinction =1.0;
-    // int currentStep = 0;
-    // // col += lightMarching(rayHead); // light for each point.
-    // while(sdf(rayHead) <= min_distance && currentStep < STEP){
-    //     // sample density
-    //     float density = 1.0;
-    //     density = sampleDensity(rayHead) ;
-    //     totalDensity += density * walk_in_distance;
-
-    //     float lightTransmittance = lightMarching(rayHead); // light for each point.
-    //     // lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
-    //     float baseTransmittance = exp(-absorption * totalDensity);
-
-    //     // vec3 lightDir = normalize(lightPosition-rayHead);
-    //     // float phase = Phase(0.7,  dot(-rayHead,lightDir));
-
-    //     col += lightTransmittance * baseTransmittance * walk_in_distance;
-
-    //     // iterate ray
-    //     rayHead += ray * walk_in_distance;
-    //     currentStep++;
-    // }
-    // extinction = exp(-absorption * totalDensity) ;
-    // alpha = 1.0-extinction;
 }
-
-
 
 void main()
 { 

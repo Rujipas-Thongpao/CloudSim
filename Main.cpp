@@ -251,6 +251,8 @@ int main()
     quadShader.setInt("_cell_amount", cellAmount);
     quadShader.setFloat("_box_width", noiseBoxWidth);
 
+	float radius = 1.0f;
+    float absorption = 10.0f;
     // render loop
     // -----------
     bool isprint = false;
@@ -305,6 +307,8 @@ int main()
 
         glBindVertexArray(0);
 
+
+
         quadShader.use();
         quadShader.setVec3("cameraPosition", cameraPos);
         quadShader.setVec3("cameraFront", cameraFront);
@@ -314,6 +318,8 @@ int main()
         quadShader.setVec3("lightPosition", lightPos);
         quadShader.setInt("_noiseSampler", 0); // or with shader class
         quadShader.setFloat("_time", glfwGetTime() / 50.0f);
+        quadShader.setFloat("_radius", radius);
+        quadShader.setFloat("_absorption", absorption);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_3D, noiseCube);
@@ -326,6 +332,8 @@ int main()
 
 
         ImGui::Begin("Cloud Simulation");
+        ImGui::SliderFloat("Radius", &radius, 0.5f, 2.0f);
+        ImGui::SliderFloat("Absorption", &absorption, 0.1f, 100.0f);
         ImGui::End();
 
 
