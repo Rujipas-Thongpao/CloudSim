@@ -253,6 +253,9 @@ int main()
 
 	float radius = 1.0f;
     float absorption = 10.0f;
+    float cutTexture = 1.0f;
+    float powderFactor = 2.0f;
+    float powderStrength = 1.0f;
     // render loop
     // -----------
     bool isprint = false;
@@ -290,7 +293,7 @@ int main()
         glm::mat4 lightModel = glm::mat4(1.0);
 
         // lightModel = glm::rotate(lightModel,(float)glfwGetTime(), glm::vec3(1.f,0.f,0.f));
-        lightModel = glm::translate(lightModel, glm::vec3(5.0f, 5.f, 0.0f));
+        lightModel = glm::translate(lightModel, glm::vec3(-5.0f, 5.f, 0.0f));
         lightModel = glm::scale(lightModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
         lightPos = glm::vec3(lightModel * glm::vec4(glm::vec3(0.0f), 1.0f));
@@ -320,6 +323,9 @@ int main()
         quadShader.setFloat("_time", glfwGetTime() / 50.0f);
         quadShader.setFloat("_radius", radius);
         quadShader.setFloat("_absorption", absorption);
+        quadShader.setFloat("_cutTexture", cutTexture);
+        quadShader.setFloat("_powderFactor", powderFactor);
+        quadShader.setFloat("_powderStrength", powderStrength);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_3D, noiseCube);
@@ -334,6 +340,9 @@ int main()
         ImGui::Begin("Cloud Simulation");
         ImGui::SliderFloat("Radius", &radius, 0.5f, 2.0f);
         ImGui::SliderFloat("Absorption", &absorption, 0.1f, 100.0f);
+        ImGui::SliderFloat("Cut Texture", &cutTexture, 1.0f, 10.0f);
+        ImGui::SliderFloat("Powder Factor", &powderFactor, 1.0f, 50.0f);
+        ImGui::SliderFloat("Powder Strength", &powderStrength, 0.1f, 1.0f);
         ImGui::End();
 
 

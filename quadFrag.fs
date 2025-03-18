@@ -16,6 +16,9 @@ uniform float _time;
 uniform sampler3D _noiseSampler;
 uniform float _radius;
 uniform float _absorption;
+uniform float _cutTexture;
+uniform float _powderFactor;
+uniform float _powderStrength;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
@@ -23,8 +26,6 @@ int STEP = 50;
 float min_distance = 0.001;
 float walk_in_distance = .03;
 float walk_light_distance = .03;
-// float absorption = 10.0; 
-// float radius = 1.0;
 vec3 lightColor = vec3(236.0, 235.0, 229.0)/255.0;
 vec3 skyColor = vec3(30.0, 137.0, 192.0)/255.0;
 float ambientFactor = 0.3;
@@ -62,9 +63,9 @@ float sampleNoise(vec3 _pos){
     float r2 = 0.8;
     float r3 = 0.3;
 
-    float w1 = .8;
-    float w2 = .15;
-    float w3 = .05;
+    float w1 = 0.8;
+    float w2 = 0.2;
+    float w3 = .00;
 
     vec3 rp1 = 1.0-(_pos - vec3(r1))/(r1*2.0);
     vec3 rp2 = 1.0-(_pos - vec3(r2))/(r2*2.0);
@@ -74,11 +75,12 @@ float sampleNoise(vec3 _pos){
     float t2 = texture(_noiseSampler, rp2).r;
     float t3 = texture(_noiseSampler, rp3).r;
 
-    return pow(w1*t1+w2*t2+w3*t3,1);
+    return pow(w1*t1+w2*t2+w3*t3,_cutTexture);
     // return 1.0;
 }
 
 float sampleDensity(vec3 p){
+    // return 1.0;
     return sampleNoise(p+ vec3(4.0, 4.0, 0.0) * _time);
 }
 
@@ -102,6 +104,12 @@ vec3 calcNormal( in vec3 pos )
 					  e.xxx*map( pos + e.xxx*eps ) );
 }
 
+float Powder(float totalDensity){
+    float powder = 1.0;
+    powder =  1-exp(-totalDensity * _absorption* _powderFactor);
+    return powder ;
+}
+
 float lightMarching(vec3 ro){
     vec3 lightDir = normalize(lightPosition);
 
@@ -120,8 +128,7 @@ float lightMarching(vec3 ro){
         t += walk_light_distance;
     }
     float transmittance = exp(-totalDensity* _absorption);
-    // float powder = 1.0;
-    // powder =  1-exp(-totalDensity * absorption* 2);
+    transmittance *= Powder(totalDensity);
     return transmittance;
 }
 
@@ -134,7 +141,7 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
 
     float t = 0.0;
     float totalDensity = 0.0;
-    col = vec3(lightMarching(ro));
+    // col = vec3(lightMarching(ro));
     for( int i=0; i<STEP; i++ )
     {
         vec3 pos = ro + t*rd;
@@ -146,14 +153,16 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
         totalDensity += density * walk_in_distance;
 
         float lightTransmittance = lightMarching(pos); // light for each point.
-         //lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
+        // lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
         float baseTransmittance = exp(-_absorption * totalDensity);
-        col += vec3(lightTransmittance * baseTransmittance * walk_in_distance);
+        
+        col += vec3(lightTransmittance * baseTransmittance * 0.1 );
 
         t += walk_in_distance;
     }
     float extinction = exp(-_absorption * totalDensity) ;
     alpha = 1.0-extinction;
+    alpha *= Powder(totalDensity);
 }
 
 void main()
