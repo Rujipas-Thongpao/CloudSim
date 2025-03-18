@@ -251,9 +251,9 @@ int main()
     quadShader.setInt("_cell_amount", cellAmount);
     quadShader.setFloat("_box_width", noiseBoxWidth);
 
-	float radius = 1.0f;
-    float absorption = 10.0f;
-    float cutTexture = 1.0f;
+	float radius = 0.6f;
+    float absorption = 20.0f;
+    float cutTexture = 2.0f;
     float powderFactor = 2.0f;
     float powderStrength = 1.0f;
     // render loop
@@ -341,8 +341,8 @@ int main()
         ImGui::SliderFloat("Radius", &radius, 0.5f, 2.0f);
         ImGui::SliderFloat("Absorption", &absorption, 0.1f, 100.0f);
         ImGui::SliderFloat("Cut Texture", &cutTexture, 1.0f, 10.0f);
-        ImGui::SliderFloat("Powder Factor", &powderFactor, 1.0f, 50.0f);
-        ImGui::SliderFloat("Powder Strength", &powderStrength, 0.1f, 1.0f);
+        //ImGui::SliderFloat("Powder Factor", &powderFactor, 1.0f, 50.0f);
+        //ImGui::SliderFloat("Powder Strength", &powderStrength, 0.1f, 1.0f);
         ImGui::End();
 
 
