@@ -19,6 +19,8 @@ uniform float _absorption;
 uniform float _cutTexture;
 uniform float _powderFactor;
 uniform float _powderStrength;
+uniform float _initialFbmAmplitude;
+uniform int _FbmOctave;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
@@ -26,6 +28,7 @@ int STEP = 50;
 float min_distance = 0.001;
 float walk_in_distance = .03;
 float walk_light_distance = .03;
+// TODO : add light color varince with the change of sky color
 vec3 lightColor = vec3(236.0, 235.0, 229.0)/255.0;
 vec3 skyColor = vec3(30.0, 137.0, 192.0)/255.0;
 float ambientFactor = 0.3;
@@ -51,44 +54,40 @@ float sdRoundBox( vec3 p, vec3 b)
 
 float sdTorus( vec3 p)
 {
-
-    vec2 t = vec2(.2,.1);
+    vec2 t = vec2(_radius,_radius/2.);
     vec2 q = vec2(length(p.xz)-t.x,p.y);
     return length(q)-t.y;
 }
 
 float sampleNoise(vec3 _pos){
-    // return ((_pos - vec3(-1.0))/2.0);
-    float r1 = 3.0;
-    float r2 = 0.8;
-    float r3 = 0.3;
+	float value = 0.0;
+    float amplitude = _initialFbmAmplitude;
+    float st = 3.0;
+    float octave = _FbmOctave; 
 
-    float w1 = 0.8;
-    float w2 = 0.2;
-    float w3 = .00;
+    // Loop of octaves
+    for (int i = 0; i < octave; i++) {
+		vec3 rp = 1.0 - (_pos- vec3(st))/(st*2.0);
+		float t = texture(_noiseSampler, rp).r;
+        value += amplitude * t;
 
-    vec3 rp1 = 1.0-(_pos - vec3(r1))/(r1*2.0);
-    vec3 rp2 = 1.0-(_pos - vec3(r2))/(r2*2.0);
-    vec3 rp3 = 1.0-(_pos - vec3(r3))/(r3*2.0);
-
-    float t1 = texture(_noiseSampler, rp1).r;
-    float t2 = texture(_noiseSampler, rp2).r;
-    float t3 = texture(_noiseSampler, rp3).r;
-
-    return pow(w1*t1+w2*t2+w3*t3,_cutTexture);
-    // return 1.0;
+        st *= .5;
+        amplitude *= .5;
+    }
+    return pow(value, _cutTexture);
 }
 
 float sampleDensity(vec3 p){
-    // return 1.0;
     return sampleNoise(p+ vec3(4.0, 4.0, 0.0) * _time);
 }
 
+// TODO : Phase function
 // float Phase(float g, float costh){
 //     return (1.0/(4.0 * 3.14)) * ((1.0 - g*g)/pow(1.0 + g*g - 2.0 * g * costh, 1.5));
 // }
 
 
+// TODO : select shape
 float map( in vec3 pos )
 {
     return sdBox(pos, vec3(_radius));
@@ -211,5 +210,6 @@ void main()
 
     }
 
+    // TODO : Color mapping
     FragColor = vec4(col,alpha);
 }
