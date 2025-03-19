@@ -27,8 +27,9 @@ glm::vec3 Camera::GetLookPos() {
     return cameraFront;
 }
 
-void Camera::processInput(GLFWwindow* window)
+void Camera::processInput(GLFWwindow* window, bool DEBUG)
 {
+    if (DEBUG) return;
     TimeUtils time;
     float cameraSpeed = .0005f * time.deltaTime();
 
@@ -44,8 +45,9 @@ void Camera::processInput(GLFWwindow* window)
     // std::cout << cameraPos.x << " " << cameraPos.y << " " << cameraPos.z << std::endl;
 }
 
-void Camera::mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void Camera::mouse_callback(GLFWwindow* window, double xpos, double ypos, bool DEBUG)
 {
+    if (DEBUG) return;
 
     if (firstMouse)
     {

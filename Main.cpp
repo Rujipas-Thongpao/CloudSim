@@ -23,6 +23,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 800;
 
 Camera camera(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
+bool DEBUG = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -261,9 +262,18 @@ int main()
     bool isprint = false;
     while (!glfwWindowShouldClose(window))
     {
+        // DEBUG TOGGLE
+        if (DEBUG) {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+        else {
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+
         // input
         // -----
         processInput(window);
+		camera.processInput(window, DEBUG);
 
         // render
         // ------
@@ -371,13 +381,23 @@ int main()
 
 
 
+bool able_to_toggle = true;
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    camera.processInput(window);
+    // DEBUG toggle
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && able_to_toggle) {
+        DEBUG = !DEBUG;
+        able_to_toggle = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) {
+        able_to_toggle = true;
+    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
@@ -391,7 +411,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    camera.mouse_callback(window, xpos, ypos);
+    camera.mouse_callback(window, xpos, ypos, DEBUG);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

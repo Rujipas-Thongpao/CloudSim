@@ -30,9 +30,9 @@ public:
 
     glm::vec3 GetLookPos();
 
-    void processInput(GLFWwindow* window);
+    void processInput(GLFWwindow* window, bool DEBUG);
 
-    void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+    void mouse_callback(GLFWwindow* window, double xpos, double ypos, bool DEBUG);
 
     void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
