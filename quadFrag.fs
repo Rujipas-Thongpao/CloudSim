@@ -74,11 +74,12 @@ float sampleNoise(vec3 _pos){
         st *= .5;
         amplitude *= .5;
     }
-    return pow(value, _cutTexture);
+    value = pow(value, _cutTexture) ;
+    return smoothstep(0.1, 0.9, value)* value;
 }
 
 float sampleDensity(vec3 p){
-    return sampleNoise(p+ vec3(4.0, 4.0, 0.0) * _time);
+    return sampleNoise(p+ vec3(1.0, 1.0, 0.0) * _time);
 }
 
 // TODO : Phase function
