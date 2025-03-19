@@ -259,6 +259,10 @@ int main()
     float powderStrength = 1.0f;
     float initialFbmAmplitude = 0.5f;
     int FbmOctave = 3;
+    // float smoothEdge[2] = { 0.1f, 0.3f };
+    //int innerEdge = 0.1f;
+    //int outerEdge = 0.3f;
+
     // render loop
     // -----------
     bool isprint = false;
@@ -357,6 +361,7 @@ int main()
         ImGui::SliderFloat("Cut Texture", &cutTexture, 1.0f, 10.0f);
         ImGui::SliderFloat("FBM initial amplitude", &initialFbmAmplitude, 0.3f, 0.9f);
         ImGui::SliderInt("FBM octave", &FbmOctave, 1, 7);
+        // ImGui::SliderFloat2("idk", &smoothEdge[0], 0.01, 0.8);
         //ImGui::SliderFloat("Powder Factor", &powderFactor, 1.0f, 50.0f);
         //ImGui::SliderFloat("Powder Strength", &powderStrength, 0.1f, 1.0f);
         ImGui::End();
