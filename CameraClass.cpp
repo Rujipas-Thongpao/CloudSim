@@ -31,7 +31,7 @@ void Camera::processInput(GLFWwindow* window, bool DEBUG)
 {
     if (DEBUG) return;
     TimeUtils time;
-    float cameraSpeed = .0005f * time.deltaTime();
+    float cameraSpeed = .0001f * time.deltaTime();
 
     // move
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)

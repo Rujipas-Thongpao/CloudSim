@@ -222,9 +222,8 @@ void main()
         vec3 pos = ro + t*rd;
 
         Cloud(pos, rd, col, alpha);
-
+		col = mix(_buttomColor, _topColor, col.x).xyz;
     }
 
-    vec3 mappedCol = mix(_topColor, _buttomColor, col.x).xyz;
-    FragColor = vec4(mappedCol,alpha);
+    FragColor = vec4(col,alpha);
 }
