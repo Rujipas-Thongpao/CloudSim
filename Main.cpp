@@ -262,7 +262,9 @@ int main()
     float initialFbmAmplitude = 0.7f;
     int FbmOctave = 4;
     float noiseSize = 3.0f;
-    float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f };
+    float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
+    float topCol[4] = {1.0f,1.0f,1.0f,1.0f};
+    float buttomCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
     // float smoothEdge[2] = { 0.1f, 0.3f };
     //int innerEdge = 0.1f;
     //int outerEdge = 0.3f;
@@ -353,7 +355,10 @@ int main()
         quadShader.setFloat("_initialFbmAmplitude", initialFbmAmplitude);
         quadShader.setInt("_FbmOctave", FbmOctave);
         quadShader.setFloat("_noiseSize", noiseSize);
-        //quadShader.setVec4("_skyColor", glm::vec4(color[0], color[1],color[2],color[3]));
+        quadShader.setVec4("_skyColor", glm::vec4(skyCol[0], skyCol[1],skyCol[2],skyCol[3]));
+        quadShader.setVec4("_topColor", glm::vec4(topCol[0], topCol[1],topCol[2],topCol[3]));
+        quadShader.setVec4("_buttomColor", glm::vec4(buttomCol[0], buttomCol[1],buttomCol[2],buttomCol[3]));
+
 
 
         glActiveTexture(GL_TEXTURE0);
@@ -368,7 +373,7 @@ int main()
 
         ImGui::Begin("Cloud Simulation Parameter");
         if (ImGui::CollapsingHeader("Shape")) {
-			ImGui::SliderFloat("Radius", &radius, 0.5f, 2.0f);
+			ImGui::SliderFloat("Radius", &radius, 0.5f, 10.0f);
 			ImGui::SliderFloat("Absorption", &absorption, 0.1f, 100.0f);
 			ImGui::SliderFloat("Scatter", &scatter, 0.01f, 100.0f);
         }
@@ -377,7 +382,7 @@ int main()
 			ImGui::SliderFloat("Cut Texture", &cutTexture, 1.0f, 10.0f);
 			ImGui::SliderFloat("FBM initial amplitude", &initialFbmAmplitude, 0.3f, 0.9f);
 			ImGui::SliderInt("FBM octave", &FbmOctave, 1, 7);
-            ImGui::SliderFloat("Noise Size", &noiseSize, 1.0f, 5.0f);
+            ImGui::SliderFloat("Noise Size", &noiseSize, 1.0f, 20.0f);
 			// ImGui::SliderFloat2("texture threshold", &smoothEdge[0], 0.01, 0.8);
         }
 
@@ -389,6 +394,8 @@ int main()
 
         if (ImGui::CollapsingHeader("Color")) {
             ImGui::ColorEdit4("Sky Color",skyCol);
+            ImGui::ColorEdit4("top Color",topCol);
+            ImGui::ColorEdit4("buttom Color",buttomCol);
         }
 
         ImGui::End();

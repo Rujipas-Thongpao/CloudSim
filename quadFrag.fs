@@ -27,7 +27,9 @@ uniform float _noiseSize;
 uniform float _innerEdge;
 uniform float _outerEdge;
 
-// uniform float4 _skyColor;
+uniform vec4 _skyColor;
+uniform vec4 _topColor;
+uniform vec4 _buttomColor;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
@@ -165,7 +167,7 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
 
         // TODO :phase function
         // float p = Phase(, dot(normalize(cameraPosition-pos),normalize(lightPosition)));
-        col += vec3(lightTransmittance * baseTransmittance * walk_in_distance);
+        col += vec3(lightTransmittance * baseTransmittance * walk_in_distance );
 
         t += walk_in_distance;
     }
@@ -223,6 +225,6 @@ void main()
 
     }
 
-    // TODO : Color mapping
-    FragColor = vec4(col,alpha);
+    vec3 mappedCol = mix(_topColor, _buttomColor, col.x).xyz;
+    FragColor = vec4(mappedCol,alpha);
 }
