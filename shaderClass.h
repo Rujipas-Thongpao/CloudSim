@@ -40,6 +40,8 @@ public:
 
     void setVec3(const std::string& name, glm::vec3 _value) const;
 
+    void setVec4(const std::string& name, glm::vec4 _value) const;
+
     void setMat4(const std::string& name, glm::mat4 _value) const;
 
 	void setArray(const std::string& name, int count, float* _value) const;

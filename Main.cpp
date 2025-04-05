@@ -253,12 +253,16 @@ int main()
     quadShader.setFloat("_box_width", noiseBoxWidth);
 
 	float radius = 0.6f;
-    float absorption = 20.0f;
-    float cutTexture = 2.0f;
+    float absorption = 35.0f;
+    float scatter= 35.0f;
+    float cutTexture = 5.0f;
+    bool powderFlag = true;
     float powderFactor = 2.0f;
-    float powderStrength = 1.0f;
-    float initialFbmAmplitude = 0.5f;
-    int FbmOctave = 3;
+    float powderOffset = 0.0f;
+    float initialFbmAmplitude = 0.7f;
+    int FbmOctave = 4;
+    float noiseSize = 3.0f;
+    float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f };
     // float smoothEdge[2] = { 0.1f, 0.3f };
     //int innerEdge = 0.1f;
     //int outerEdge = 0.3f;
@@ -288,7 +292,7 @@ int main()
         glEnable(GL_BLEND);
         // glEnable(GL_STENCIL_TEST);
 
-        glClearColor(30.0f / 255.0f, 137.0f / 255.0f, 192.0f / 255.0f, 1.0f);                   // state-setting // this is like configuration for 'glclear'
+        glClearColor(skyCol[0], skyCol[1],skyCol[2],skyCol[3]);                   // state-setting // this is like configuration for 'glclear'
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // state-using
 
 
@@ -339,11 +343,18 @@ int main()
         quadShader.setFloat("_time", glfwGetTime() / 50.0f);
         quadShader.setFloat("_radius", radius);
         quadShader.setFloat("_absorption", absorption);
+        quadShader.setFloat("_scatter", scatter);
         quadShader.setFloat("_cutTexture", cutTexture);
+        // powder Parameter
+        quadShader.setBool("_powderFlag", powderFlag);
         quadShader.setFloat("_powderFactor", powderFactor);
-        quadShader.setFloat("_powderStrength", powderStrength);
+        quadShader.setFloat("_powderOffset", powderOffset);
+        // FBM parameter
         quadShader.setFloat("_initialFbmAmplitude", initialFbmAmplitude);
         quadShader.setInt("_FbmOctave", FbmOctave);
+        quadShader.setFloat("_noiseSize", noiseSize);
+        //quadShader.setVec4("_skyColor", glm::vec4(color[0], color[1],color[2],color[3]));
+
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_3D, noiseCube);
@@ -355,15 +366,31 @@ int main()
         glBindVertexArray(0);
 
 
-        ImGui::Begin("Cloud Simulation");
-        ImGui::SliderFloat("Radius", &radius, 0.5f, 2.0f);
-        ImGui::SliderFloat("Absorption", &absorption, 0.1f, 100.0f);
-        ImGui::SliderFloat("Cut Texture", &cutTexture, 1.0f, 10.0f);
-        ImGui::SliderFloat("FBM initial amplitude", &initialFbmAmplitude, 0.3f, 0.9f);
-        ImGui::SliderInt("FBM octave", &FbmOctave, 1, 7);
-        // ImGui::SliderFloat2("idk", &smoothEdge[0], 0.01, 0.8);
-        //ImGui::SliderFloat("Powder Factor", &powderFactor, 1.0f, 50.0f);
-        //ImGui::SliderFloat("Powder Strength", &powderStrength, 0.1f, 1.0f);
+        ImGui::Begin("Cloud Simulation Parameter");
+        if (ImGui::CollapsingHeader("Shape")) {
+			ImGui::SliderFloat("Radius", &radius, 0.5f, 2.0f);
+			ImGui::SliderFloat("Absorption", &absorption, 0.1f, 100.0f);
+			ImGui::SliderFloat("Scatter", &scatter, 0.01f, 100.0f);
+        }
+
+        if (ImGui::CollapsingHeader("FBM")) {
+			ImGui::SliderFloat("Cut Texture", &cutTexture, 1.0f, 10.0f);
+			ImGui::SliderFloat("FBM initial amplitude", &initialFbmAmplitude, 0.3f, 0.9f);
+			ImGui::SliderInt("FBM octave", &FbmOctave, 1, 7);
+            ImGui::SliderFloat("Noise Size", &noiseSize, 1.0f, 5.0f);
+			// ImGui::SliderFloat2("texture threshold", &smoothEdge[0], 0.01, 0.8);
+        }
+
+        if (ImGui::CollapsingHeader("Powder")) {
+            ImGui::Checkbox("Powder flags", &powderFlag);
+            ImGui::SliderFloat("Powder Factor", &powderFactor, 1.0f, 50.0f);
+            ImGui::SliderFloat("Powder Offset", &powderOffset, 0.1f, 1.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Color")) {
+            ImGui::ColorEdit4("Sky Color",skyCol);
+        }
+
         ImGui::End();
 
 
