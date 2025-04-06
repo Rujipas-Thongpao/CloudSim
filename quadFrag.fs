@@ -33,7 +33,7 @@ uniform vec4 _buttomColor;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
-int STEP = 150;
+int STEP = 50;
 float min_distance = 0.001;
 float walk_in_distance = .03;
 float walk_light_distance = .03;
@@ -116,8 +116,9 @@ float Powder(float totalDensity){
 }
 
 // TODO : Phase function
-float Phase(float g, float costh){
-    return (1.0/(4.0 * 3.14)) * ((1.0 - g*g)/pow(1.0 + g*g - 2.0 * g * costh, 1.5));
+float Phase(float g, float cos_theta) {
+    float denom = 1.0f + (g * g) - (2.0f * g * cos_theta);
+    return (1.0f / (4.0f * 3.14)) * ((1.0f - (g * g)) / (denom * sqrt(denom)));
 }
 
 float lightMarching(vec3 ro){
@@ -153,6 +154,7 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
     float transmittance= 1.0;
     vec3 lightEnergy = vec3(0.0);
 
+    vec3 lightDir = normalize(lightPosition);
 
     float t = 0.0;
     for( int i=0; i<STEP; i++ )
@@ -166,6 +168,9 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
 
         if(density > 0.0){
 			float lightTransmittance = lightMarching(pos); // light for each point.
+
+            float cos_theta = dot(normalize(rd), normalize(lightDir));
+            float p = Phase(0.9, cos_theta);
             lightEnergy += density * transmittance * lightTransmittance;
             transmittance *= exp(-density * walk_in_distance * _absorption);
         }

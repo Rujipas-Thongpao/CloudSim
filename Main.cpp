@@ -265,6 +265,7 @@ int main()
     float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
     float topCol[4] = {1.0f,1.0f,1.0f,1.0f};
     float buttomCol[4] = { 0.0f, 0.0f,0.0f,1.0f};
+    float sunAngle = 0.785398163f;
     // float smoothEdge[2] = { 0.1f, 0.3f };
     //int innerEdge = 0.1f;
     //int outerEdge = 0.3f;
@@ -315,7 +316,8 @@ int main()
         glm::mat4 lightModel = glm::mat4(1.0);
 
         // lightModel = glm::rotate(lightModel,(float)glfwGetTime(), glm::vec3(1.f,0.f,0.f));
-        lightModel = glm::translate(lightModel, glm::vec3(-5.0f, 5.f, 0.0f));
+        lightModel = glm::rotate(lightModel, sunAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+        lightModel = glm::translate(lightModel, glm::vec3(0.0f, 5.f, 0.0f));
         lightModel = glm::scale(lightModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
         lightPos = glm::vec3(lightModel * glm::vec4(glm::vec3(0.0f), 1.0f));
@@ -393,9 +395,13 @@ int main()
         }
 
         if (ImGui::CollapsingHeader("Color")) {
-            ImGui::ColorEdit4("Sky Color",skyCol);
             ImGui::ColorEdit4("top Color",topCol);
             ImGui::ColorEdit4("buttom Color",buttomCol);
+        }
+
+        if (ImGui::CollapsingHeader("Sky")) {
+            ImGui::ColorEdit4("Sky Color",skyCol);
+            ImGui::SliderAngle("sun angle(Rad)", &sunAngle);
         }
 
         ImGui::End();
