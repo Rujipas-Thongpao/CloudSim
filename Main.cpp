@@ -264,7 +264,7 @@ int main()
     float noiseSize = 3.0f;
     float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
     float topCol[4] = {1.0f,1.0f,1.0f,1.0f};
-    float buttomCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
+    float buttomCol[4] = { 0.0f, 0.0f,0.0f,1.0f};
     // float smoothEdge[2] = { 0.1f, 0.3f };
     //int innerEdge = 0.1f;
     //int outerEdge = 0.3f;

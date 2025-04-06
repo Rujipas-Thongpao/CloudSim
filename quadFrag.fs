@@ -136,10 +136,11 @@ float lightMarching(vec3 ro){
 
         totalDensity += density * walk_light_distance;
         t += walk_light_distance;
+        i++;
     }
     float transmittance = exp(-totalDensity* _scatter);
     transmittance *= Powder(totalDensity);
-    return 1.0;
+    return transmittance;
 }
 
 
@@ -157,19 +158,23 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
         float h = map(pos);
         if( h>min_distance) break;
 
-        float density = 1.0;
-        density = sampleDensity(pos) ;
+        float density = 0.0;
+        float lightTransmittance = 1.0;
+        float baseTransmittance = 1.0;
+
+		density = sampleDensity(pos) ;
         totalDensity += density * walk_in_distance;
 
-        float lightTransmittance = lightMarching(pos); // light for each point.
-        // lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
-        float baseTransmittance = exp(-_scatter * totalDensity);
+		lightTransmittance = lightMarching(pos); // light for each point.
+		// lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
+		baseTransmittance = exp(-_scatter * totalDensity);
 
         // TODO :phase function
         // float p = Phase(, dot(normalize(cameraPosition-pos),normalize(lightPosition)));
         col += vec3(lightTransmittance * baseTransmittance * walk_in_distance );
 
         t += walk_in_distance;
+        i++;
     }
     float extinction = exp(-_absorption * totalDensity) ;
     alpha = 1.0-extinction;
