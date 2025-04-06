@@ -33,7 +33,7 @@ uniform vec4 _buttomColor;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
-int STEP = 50;
+int STEP = 150;
 float min_distance = 0.001;
 float walk_in_distance = .03;
 float walk_light_distance = .03;
@@ -150,8 +150,11 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
     alpha = 1.0;
     col = vec3(0.0);
 
+    float transmittance= 1.0;
+    vec3 lightEnergy = vec3(0.0);
+
+
     float t = 0.0;
-    float totalDensity = 0.0;
     for( int i=0; i<STEP; i++ )
     {
         vec3 pos = ro + t*rd;
@@ -159,29 +162,19 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
         if( h>min_distance) break;
 
         float density = 0.0;
-        float lightTransmittance = 1.0;
-        float baseTransmittance = 1.0;
-
 		density = sampleDensity(pos) ;
-        totalDensity += density * walk_in_distance;
 
-		lightTransmittance = lightMarching(pos); // light for each point.
-		// lightTransmittance *=  1/pow(length(lightPosition-rayHead),2.0);  // if we care about point light.
-		baseTransmittance = exp(-_scatter * totalDensity);
-
-        // TODO :phase function
-        // float p = Phase(, dot(normalize(cameraPosition-pos),normalize(lightPosition)));
-        col += vec3(lightTransmittance * baseTransmittance * walk_in_distance );
-
+        if(density > 0.0){
+			float lightTransmittance = lightMarching(pos); // light for each point.
+            lightEnergy += density * transmittance * lightTransmittance;
+            transmittance *= exp(-density * walk_in_distance * _absorption);
+        }
         t += walk_in_distance;
         i++;
     }
-    float extinction = exp(-_absorption * totalDensity) ;
-    alpha = 1.0-extinction;
-    alpha *= Powder(totalDensity);
-    // col += 0.5;
-    // col =  vec3(1.0);
-    // col = 1.0 - col;
+    vec3 cloudCol = lightEnergy;
+    col = _skyColor.xyz * transmittance + cloudCol;
+    alpha = 1.0 - transmittance;
 }
 
 void main()

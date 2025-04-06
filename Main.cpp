@@ -254,14 +254,14 @@ int main()
 
 	float radius = 0.6f;
     float absorption = 35.0f;
-    float scatter= 35.0f;
-    float cutTexture = 5.0f;
-    bool powderFlag = true;
+    float scatter= 5.0f;
+    float cutTexture = 3.0f;
+    bool powderFlag = false;
     float powderFactor = 2.0f;
     float powderOffset = 0.0f;
     float initialFbmAmplitude = 0.7f;
     int FbmOctave = 4;
-    float noiseSize = 3.0f;
+    float noiseSize = 2.0f;
     float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
     float topCol[4] = {1.0f,1.0f,1.0f,1.0f};
     float buttomCol[4] = { 0.0f, 0.0f,0.0f,1.0f};
@@ -342,7 +342,7 @@ int main()
         quadShader.setMat4("projection", proj);
         quadShader.setVec3("lightPosition", lightPos);
         quadShader.setInt("_noiseSampler", 0); // or with shader class
-        quadShader.setFloat("_time", glfwGetTime() / 50.0f);
+        quadShader.setFloat("_time", glfwGetTime() / 40.0f);
         quadShader.setFloat("_radius", radius);
         quadShader.setFloat("_absorption", absorption);
         quadShader.setFloat("_scatter", scatter);
