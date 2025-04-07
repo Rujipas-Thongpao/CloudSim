@@ -20,7 +20,6 @@ https://github.com/user-attachments/assets/7703513c-7d65-4568-a1df-b3f783d94b4a
 - GLFW
 - GLAD
 - ImGui
-- stb_image (optional, if used)
 
 ## Build Instructions
 1. Clone the repository
@@ -33,6 +32,7 @@ https://github.com/user-attachments/assets/7703513c-7d65-4568-a1df-b3f783d94b4a
 Doing...
 
 ## 🚀 Credits & Inspiration
+- [Horizon:Zero dawn : The real-time volumetric](https://d3d3g8mu99pzk9.cloudfront.net/AndrewSchneider/The-Real-time-Volumetric-Cloudscapes-of-Horizon-Zero-Dawn.pdf)
 - [Acerola - Real-time Raymarching](https://www.youtube.com/watch?v=ryB8hT5TMSg&t=1430s)
 - [Inigo Quilez (Iquilezles)](https://iquilezles.org/)
 - [Sebastian Lague - Clouds](https://www.youtube.com/watch?v=4QOcCGI6xOU&t=566s)
