@@ -123,7 +123,7 @@ float Phase(float g, float cos_theta) {
 }
 
 float lightMarching(vec3 ro){
-    vec3 lightDir = normalize(lightPosition);
+    vec3 lightDir = normalize(lightPosition - ro);
 
     float t = 0.0;
     float totalDensity = 0.0;
@@ -229,6 +229,6 @@ void main()
         Cloud(pos, rd, col, alpha);
 		col = mix(_buttomColor.xyz, col, length(col)).xyz;
     }
-
+    
     FragColor = vec4(col,alpha);
 }

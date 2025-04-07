@@ -433,8 +433,7 @@ int main()
         }
 
         if (ImGui::CollapsingHeader("Color")) {
-            ImGui::ColorEdit4("top Color",topCol);
-            ImGui::ColorEdit4("buttom Color",buttomCol);
+            ImGui::ColorEdit4("Ambient light Color",buttomCol);
         }
 
         if (ImGui::CollapsingHeader("Sky")) {
