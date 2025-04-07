@@ -1,4 +1,4 @@
-#include"imgui.h"
+﻿#include"imgui.h"
 #include"imgui_impl_glfw.h"
 #include"imgui_impl_opengl3.h"
 
@@ -189,7 +189,7 @@ int main()
     }
 
 
-    // ᵡ�ç���! -> noiseResolution �����Թ
+    // แตกตรงนี้! -> noiseResolution เยอะเกิน
     // TODO : move to compute shader.
 
     unsigned int noiseCube;
@@ -266,6 +266,14 @@ int main()
     float topCol[4] = {1.0f,1.0f,1.0f,1.0f};
     float buttomCol[4] = { 0.0f, 0.0f,0.0f,1.0f};
     float sunAngle = 0.785398163f;
+
+
+    // Sky color transitions: night → dawn/dusk → day
+    glm::vec3 nightSky = glm::vec3(0.02f, 0.02f, 0.1f);
+    glm::vec3 daySky = glm::vec3(0.53f, 0.81f, 0.92f); // sky blue
+    glm::vec3 sunsetSky = glm::vec3(1.0f, 0.4f, 0.2f);   // orange-pink
+
+
     // float smoothEdge[2] = { 0.1f, 0.3f };
     //int innerEdge = 0.1f;
     //int outerEdge = 0.3f;
@@ -295,6 +303,33 @@ int main()
         glEnable(GL_BLEND);
         // glEnable(GL_STENCIL_TEST);
 
+        float sunHeight = sin(sunAngle); // -1 (night) to 1 (noon)
+        sunHeight = glm::clamp(sunHeight, 0.0f, 1.0f); // only from sunrise to sunset
+        glm::vec3 targetSkyColor;
+        if (sunHeight < 0.2f) {
+            float t = sunHeight / 0.2f;
+            targetSkyColor = glm::mix(nightSky, sunsetSky, t);
+        }
+        else {
+            float t = (sunHeight - 0.2f) / 0.8f;
+            targetSkyColor = glm::mix(sunsetSky, daySky, t);
+        }
+
+        skyCol[0] = targetSkyColor.r;
+        skyCol[1] = targetSkyColor.g;
+        skyCol[2] = targetSkyColor.b;
+        skyCol[3] = 1.0f;
+
+        glm::vec3 baseLightColor;
+		float t = sunHeight ;
+		baseLightColor = glm::mix(glm::vec3(1.0f, 0.5f, 0.2f), glm::vec3(1.0f), t); // orange -> white
+
+
+        float lightIntensity = glm::clamp(sunHeight, 0.0f, 1.0f);
+        lightIntensity = pow(lightIntensity, 0.2f); 
+
+        glm::vec3 finalLightColor = baseLightColor * lightIntensity;
+
         glClearColor(skyCol[0], skyCol[1],skyCol[2],skyCol[3]);                   // state-setting // this is like configuration for 'glclear'
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // state-using
 
@@ -317,10 +352,11 @@ int main()
 
         // lightModel = glm::rotate(lightModel,(float)glfwGetTime(), glm::vec3(1.f,0.f,0.f));
         lightModel = glm::rotate(lightModel, sunAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-        lightModel = glm::translate(lightModel, glm::vec3(0.0f, 5.f, 0.0f));
+        lightModel = glm::translate(lightModel, glm::vec3(5.0f, 0.f, 0.0f));
         lightModel = glm::scale(lightModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
         lightPos = glm::vec3(lightModel * glm::vec4(glm::vec3(0.0f), 1.0f));
+
 
 
         // Render Light cube
@@ -328,6 +364,7 @@ int main()
         lightCubeShader.setMat4("model", lightModel);
         lightCubeShader.setMat4("view", view);
         lightCubeShader.setMat4("projection", proj);
+        lightCubeShader.setVec3("lightColor", finalLightColor);
 
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -360,6 +397,7 @@ int main()
         quadShader.setVec4("_skyColor", glm::vec4(skyCol[0], skyCol[1],skyCol[2],skyCol[3]));
         quadShader.setVec4("_topColor", glm::vec4(topCol[0], topCol[1],topCol[2],topCol[3]));
         quadShader.setVec4("_buttomColor", glm::vec4(buttomCol[0], buttomCol[1],buttomCol[2],buttomCol[3]));
+        quadShader.setVec3("_lightColor", finalLightColor);
 
 
 

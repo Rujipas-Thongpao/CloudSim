@@ -28,6 +28,7 @@ uniform float _innerEdge;
 uniform float _outerEdge;
 
 uniform vec4 _skyColor;
+uniform vec3 _lightColor;
 uniform vec4 _topColor;
 uniform vec4 _buttomColor;
 
@@ -177,8 +178,9 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
         t += walk_in_distance;
         i++;
     }
-    vec3 cloudCol = lightEnergy;
-    col = _skyColor.xyz * transmittance + cloudCol;
+    // lightEnergy = clamp(lightEnergy, vec3(0.0), vec3(1.0));
+    vec3 cloudCol = lightEnergy * _lightColor;
+    col = cloudCol + (_skyColor.xyz * transmittance);
     alpha = 1.0 - transmittance;
 }
 
@@ -225,7 +227,7 @@ void main()
         vec3 pos = ro + t*rd;
 
         Cloud(pos, rd, col, alpha);
-		col = mix(_buttomColor, _topColor, col.x).xyz;
+		col = mix(_buttomColor.xyz, col, length(col)).xyz;
     }
 
     FragColor = vec4(col,alpha);
