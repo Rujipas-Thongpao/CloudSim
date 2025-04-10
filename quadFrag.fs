@@ -29,8 +29,9 @@ uniform float _outerEdge;
 
 uniform vec4 _skyColor;
 uniform vec3 _lightColor;
-uniform vec4 _topColor;
-uniform vec4 _buttomColor;
+uniform vec3 _topColor;
+uniform vec3 _buttomColor;
+uniform vec3 _ambientColor;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
@@ -86,8 +87,7 @@ float sampleNoise(vec3 _pos){
     }
     value = pow(value, _cutTexture) ;
     // TODO: controller for this.
-    return smoothstep(0.01, 0.5, value)* value;
-}
+    return smoothstep(0.01, 0.5, value)* value; }
 
 float sampleDensity(vec3 p){
     return sampleNoise(p+ vec3(1.0, 1.0, 0.0) * _time);
@@ -178,7 +178,6 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
         t += walk_in_distance;
         i++;
     }
-    // lightEnergy = clamp(lightEnergy, vec3(0.0), vec3(1.0));
     vec3 cloudCol = lightEnergy * _lightColor;
     col = cloudCol + (_skyColor.xyz * transmittance);
     alpha = 1.0 - transmittance;
@@ -227,7 +226,12 @@ void main()
         vec3 pos = ro + t*rd;
 
         Cloud(pos, rd, col, alpha);
-		col = mix(_buttomColor.xyz, col, length(col)).xyz;
+        clamp(col, vec3(0.0), vec3(1.0));
+
+		col = mix(_ambientColor, col, length(col));
+        // col = mix(_buttomColor, _topColor, length(col)).xyz;
+        col *= mix(_buttomColor, _topColor, pos.y/_radius);
+
     }
     
     FragColor = vec4(col,alpha);

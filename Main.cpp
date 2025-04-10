@@ -263,8 +263,9 @@ int main()
     int FbmOctave = 4;
     float noiseSize = 2.0f;
     float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
-    float topCol[4] = {1.0f,1.0f,1.0f,1.0f};
-    float buttomCol[4] = { 0.0f, 0.0f,0.0f,1.0f};
+    float topCol[3] = {1.0f,1.0f,1.0f};
+    float buttomCol[3] = { 0.0f, 0.0f,0.0f};
+    float ambientCol[3] = { 0.0f, 0.0f,0.0f};
     float sunAngle = 0.785398163f;
 
 
@@ -395,9 +396,10 @@ int main()
         quadShader.setInt("_FbmOctave", FbmOctave);
         quadShader.setFloat("_noiseSize", noiseSize);
         quadShader.setVec4("_skyColor", glm::vec4(skyCol[0], skyCol[1],skyCol[2],skyCol[3]));
-        quadShader.setVec4("_topColor", glm::vec4(topCol[0], topCol[1],topCol[2],topCol[3]));
-        quadShader.setVec4("_buttomColor", glm::vec4(buttomCol[0], buttomCol[1],buttomCol[2],buttomCol[3]));
+        quadShader.setVec3("_topColor", glm::vec3(topCol[0], topCol[1],topCol[2]));
+        quadShader.setVec3("_buttomColor", glm::vec3(buttomCol[0], buttomCol[1],buttomCol[2]));
         quadShader.setVec3("_lightColor", finalLightColor);
+        quadShader.setVec3("_ambientColor", glm::vec3(ambientCol[0], ambientCol[1], ambientCol[2]));
 
 
 
@@ -433,7 +435,9 @@ int main()
         }
 
         if (ImGui::CollapsingHeader("Color")) {
-            ImGui::ColorEdit4("Ambient light Color",buttomCol);
+            ImGui::ColorEdit3("Top Color", topCol);
+            ImGui::ColorEdit3("Buttom Color",buttomCol);
+            ImGui::ColorEdit3("Ambient Color",ambientCol);
         }
 
         if (ImGui::CollapsingHeader("Sky")) {
