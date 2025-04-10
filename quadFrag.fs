@@ -148,7 +148,6 @@ float lightMarching(vec3 ro){
 
 
 void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
-
     alpha = 1.0;
     col = vec3(0.0);
 
@@ -158,6 +157,7 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
     vec3 lightDir = normalize(lightPosition);
 
     float t = 0.0;
+    float totalDensity = 0.0;
     for( int i=0; i<STEP; i++ )
     {
         vec3 pos = ro + t*rd;
@@ -166,19 +166,18 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
 
         float density = 0.0;
 		density = sampleDensity(pos) ;
+        totalDensity += density * walk_in_distance;
 
-        if(density > 0.0){
-			float lightTransmittance = lightMarching(pos); // light for each point.
+		float lightTransmittance = lightMarching(pos);
+		float baseTransmittance = exp(-totalDensity * _absorption);
 
-            float cos_theta = dot(normalize(rd), normalize(lightDir));
-            float p = Phase(0.9, cos_theta);
-            lightEnergy += density * transmittance * lightTransmittance;
-            transmittance *= exp(-density * walk_in_distance * _absorption);
-        }
+		lightEnergy += baseTransmittance * lightTransmittance * density;
+
         t += walk_in_distance;
         i++;
     }
     vec3 cloudCol = lightEnergy * _lightColor;
+    transmittance =exp(-totalDensity * _absorption); 
     col = cloudCol + (_skyColor.xyz * transmittance);
     alpha = 1.0 - transmittance;
 }
@@ -230,7 +229,7 @@ void main()
 
 		col = mix(_ambientColor, col, length(col));
         // col = mix(_buttomColor, _topColor, length(col)).xyz;
-        col *= mix(_buttomColor, _topColor, pos.y/_radius);
+        // col *= mix(_buttomColor, _topColor, pos.y/_radius);
 
     }
     
