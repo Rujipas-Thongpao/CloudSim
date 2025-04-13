@@ -39,7 +39,7 @@ uniform bool _blueNoiseFlag;
 
 float fov = 45.0;
 float d2r = 0.0174532925; 
-int STEP = 50;
+int STEP = 100;
 float min_distance = 0.001;
 float walk_in_distance = .03;
 float walk_light_distance = .03;
@@ -187,6 +187,7 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
     float extinction = basedTranmittance;
     col = cloudCol + (_skyColor.xyz * extinction);
     alpha = 1.0 - extinction;
+    alpha *= Powder(totalDensity);
 }
 
 void main()

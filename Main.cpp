@@ -271,8 +271,8 @@ int main()
     float noiseSize = 2.0f;
     float skyCol[4] = { 135.f/255.f, 206.f/255.f, 234.f/255.f , 1.0f};
     float topCol[3] = {1.0f,1.0f,1.0f};
-    float buttomCol[3] = { 0.0f, 0.0f,0.0f};
-    float ambientCol[3] = { 0.0f, 0.0f,0.0f};
+    float buttomCol[3] = { 1.0f, 1.0f,1.0f};
+    float ambientCol[3] = { 151.f/255.f, 164.f/255.f, 175.f/255.f};
     float sunAngle = 0.785398163f;
     bool blueNoiseFlag = true;
 
