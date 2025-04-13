@@ -1,6 +1,8 @@
 #version 330 core
 out vec4 FragColor;
 
+in vec2 TexCoord;
+uniform sampler2D _blueNoiseSampler;
 
 uniform vec3 cameraPosition;
 uniform vec3 cameraFront;
@@ -33,6 +35,8 @@ uniform vec3 _topColor;
 uniform vec3 _buttomColor;
 uniform vec3 _ambientColor;
 
+uniform bool _blueNoiseFlag;
+
 float fov = 45.0;
 float d2r = 0.0174532925; 
 int STEP = 50;
@@ -45,6 +49,7 @@ vec3 skyColor = vec3(30.0, 137.0, 192.0)/255.0;
 float ambientFactor = 0.3;
 float scatteringFactor = .3;
 float extinctionFactor = 1.5;
+float bn = _blueNoiseFlag ? (length(texture(_blueNoiseSampler, TexCoord * 2.0).xyz)) : 1.0;
 
 float sdSphere( vec3 p, float s )
 {
@@ -129,7 +134,7 @@ float lightMarching(vec3 ro){
     float totalDensity = 0.0;
     for( int i=0; i<STEP; i++ )
     {
-        vec3 pos = ro + t*lightDir;
+        vec3 pos = ro + (bn*t*lightDir);
         float h = map(pos);
         if( h>min_distance) break;
 
@@ -163,7 +168,7 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
     float basedTranmittance = 1.0;
     for( int i=0; i<STEP; i++ )
     {
-        vec3 pos = ro + t*rd;
+        vec3 pos = ro + (bn*t*rd);
         float h = map(pos);
         if( h>min_distance) break;
 
@@ -171,14 +176,9 @@ void Cloud(vec3 ro, vec3 rd, out vec3 col, out float alpha){
 		density = sampleDensity(pos) ;
         totalDensity += density * walk_in_distance;
 
-		lightEnergy += baseTransmittance * lightTransmittance * density;
-
-
-            // float cos_theta = dot(normalize(rd), normalize(lightDir));
-            // float p = Phase(0.9, cos_theta);
-            cloudCol += density * basedTranmittance * lightTransmittance * _lightColor;
-            basedTranmittance = exp(-totalDensity * _absorption);
-        }
+        float lightTransmittance = lightMarching(pos);
+		cloudCol += density * basedTranmittance * lightTransmittance * _lightColor;
+		basedTranmittance = exp(-totalDensity * _absorption);
 
         t += walk_in_distance;
         i++;

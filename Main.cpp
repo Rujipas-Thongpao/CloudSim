@@ -8,6 +8,7 @@
 #include<GLFW/glfw3.h>
 #include <math.h>
 
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -15,6 +16,7 @@
 
 #include "shaderClass.h"
 #include "CameraClass.h"
+#include "Texture.h"
 
 #include "Utils.h" 
 
@@ -75,14 +77,15 @@ int main()
     ImGui_ImplOpenGL3_Init("#version 330");
 
     float quadVertices[] = {
-        // positions   
-        -1.0f,  1.0f,
-        -1.0f, -1.0f,
-         1.0f, -1.0f,
-        -1.0f,  1.0f,
-         1.0f, -1.0f,
-         1.0f,  1.0f
+        // positions  // texture 
+        -1.0f,  1.0f, 0.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f, 0.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f, 1.0f,
+         1.0f, -1.0f, 1.0f, 0.0f,
+         1.0f,  1.0f, 1.0f, 1.0f
     };
+
 
 
     float cube_vertices[] = {
@@ -144,9 +147,13 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, QuadVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
     
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    //bind vertex
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    //bind texture
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
 
     // unbind
@@ -267,6 +274,7 @@ int main()
     float buttomCol[3] = { 0.0f, 0.0f,0.0f};
     float ambientCol[3] = { 0.0f, 0.0f,0.0f};
     float sunAngle = 0.785398163f;
+    bool blueNoiseFlag = true;
 
 
     // Sky color transitions: night → dawn/dusk → day
@@ -278,6 +286,10 @@ int main()
     // float smoothEdge[2] = { 0.1f, 0.3f };
     //int innerEdge = 0.1f;
     //int outerEdge = 0.3f;
+
+
+    // blue noise
+    Texture bloudNoise("blue_noise.png");
 
     // render loop
     // -----------
@@ -395,16 +407,26 @@ int main()
         quadShader.setFloat("_initialFbmAmplitude", initialFbmAmplitude);
         quadShader.setInt("_FbmOctave", FbmOctave);
         quadShader.setFloat("_noiseSize", noiseSize);
-        quadShader.setVec4("_skyColor", glm::vec4(skyCol[0], skyCol[1],skyCol[2],skyCol[3]));
+
         quadShader.setVec3("_topColor", glm::vec3(topCol[0], topCol[1],topCol[2]));
         quadShader.setVec3("_buttomColor", glm::vec3(buttomCol[0], buttomCol[1],buttomCol[2]));
-        quadShader.setVec3("_lightColor", finalLightColor);
         quadShader.setVec3("_ambientColor", glm::vec3(ambientCol[0], ambientCol[1], ambientCol[2]));
+
+        quadShader.setVec4("_skyColor", glm::vec4(skyCol[0], skyCol[1],skyCol[2],skyCol[3]));
+        quadShader.setVec3("_lightColor", finalLightColor);
+
+        quadShader.setBool("_blueNoiseFlag", blueNoiseFlag);
 
 
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_3D, noiseCube);
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, bloudNoise.texture);
+
+        quadShader.setInt("_noiseSampler", 0);
+        quadShader.setInt("_blueNoiseSampler", 1);
 
         glBindVertexArray(QuadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -435,6 +457,7 @@ int main()
         }
 
         if (ImGui::CollapsingHeader("Color")) {
+            ImGui::Checkbox("blue noise", &blueNoiseFlag);
             ImGui::ColorEdit3("Top Color", topCol);
             ImGui::ColorEdit3("Buttom Color",buttomCol);
             ImGui::ColorEdit3("Ambient Color",ambientCol);

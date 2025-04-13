@@ -66,6 +66,9 @@
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -107,6 +110,9 @@
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="defaultVert.vs">
@@ -127,5 +133,10 @@
     <None Include="quadFrag.fs">
       <Filter>Resource Files\Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\HP\Downloads\blue_noise.png">
+      <Filter>Resource Files\Shader</Filter>
+    </Image>
   </ItemGroup>
 </Project>
