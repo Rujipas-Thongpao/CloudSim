@@ -29,7 +29,7 @@ https://github.com/user-attachments/assets/7703513c-7d65-4568-a1df-b3f783d94b4a
 
 
 # 📄Report
-Doing...
+https://docs.google.com/document/d/151fDxGeClNTL4wgZDvt-vKPbb039j6gsK6gI9Y-tBjc/edit?usp=sharing
 
 ## 🚀 Credits & Inspiration
 - [Horizon:Zero dawn : The real-time volumetric](https://d3d3g8mu99pzk9.cloudfront.net/AndrewSchneider/The-Real-time-Volumetric-Cloudscapes-of-Horizon-Zero-Dawn.pdf)
